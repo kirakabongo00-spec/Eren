@@ -54,7 +54,7 @@ function clean() {
     }
 
     fs.readdirSync(__dirname).forEach(file => {
-        if (file === "deploy.js" || file === ".git") return 
+        if (file === "Eren" || file === ".git" || file === "requirements.txt") return 
         try {
             const p = path.join(__dirname, file)
             fs.statSync(p).isDirectory()
@@ -80,7 +80,8 @@ function setup() {
         }, null, 2))
     }
 
-    const ax = path.join(__dirname, "erenex", "erenex.js")
+    // Corrigé pour chercher dans le dossier cloné
+    const ax = path.join(__dirname, "Eren_jaeger", "erenex", "erenex.js")
     if (fs.existsSync(ax)) {
         fs.writeFileSync(ax,
             fs.readFileSync(ax, "utf8")
@@ -99,8 +100,9 @@ function installDeps() {
 async function startBot() {
     inf("Démarrage d'EREN JAEGER...")
     try {
-        const { default: connect } = await import("./erenex/erenex.js")
-        const { default: handler } = await import("./eren/erens.js")
+        // Corrigé pour pointer vers le dossier Eren_jaeger cloné
+        const { default: connect } = await import("./Eren_jaeger/erenex/erenex.js")
+        const { default: handler } = await import("./Eren_jaeger/eren/erens.js")
         await connect(handler)
     } catch(e) {
         err(`Erreur: ${e.message}`)
@@ -115,7 +117,8 @@ async function main() {
     
     try {
         await progress("Nettoyage", async () => clean())
-        await progress("Clonage GitHub", async () => execSync(`git clone ${GITHUB_REPO} .`, { stdio: "pipe" }))
+        // Corrigé : On clone dans son propre dossier pour éviter le conflit de dossier non vide
+        await progress("Clonage GitHub", async () => execSync(`git clone ${GITHUB_REPO}`, { stdio: "pipe" }))
         await progress("Configuration", async () => setup())
         await progress("Installation des dépendances", () => installDeps())
         console.log(`\n${c.red}${c.bold}  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${c.reset}`)
